@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="El Cielo">
+<meta name="theme-color" content="#0F2912">
+<title>Cotizador · Reserva El Cielo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  :root{
+    --verde:#1A3D1B; --verde-d:#0F2912; --verde-l:#2C5F2D;
+    --dorado:#C8973A; --dorado-l:#E8B84B; --crema:#FAF6EE;
+    --tinta:#15201A; --musgo:#9FB89F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'Outfit',sans-serif;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(200,151,58,0.18), transparent 55%),
+      linear-gradient(170deg,#0F2912 0%,#15201A 55%,#0A1A0A 100%);
+    background-attachment:fixed;
+    color:var(--crema);
+    min-height:100vh;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:440px;margin:0 auto;padding:20px 18px 50px;}
+
+  /* HEADER / LOGO */
+  .logo{
+    background:var(--crema);border:2px solid var(--verde);
+    border-radius:14px;padding:14px 10px 11px;text-align:center;
+    margin:6px auto 22px;width:228px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+  }
+  .logo .r{font-family:'Outfit';font-weight:700;font-size:12px;letter-spacing:7px;color:var(--dorado);}
+  .logo .bar{height:2px;width:120px;background:var(--dorado);margin:3px auto;}
+  .logo .ec{font-family:'Fraunces';font-weight:900;font-size:34px;letter-spacing:1px;color:var(--verde);line-height:1;}
+  .logo .sub{font-family:'Fraunces';font-style:italic;font-size:8px;letter-spacing:2px;color:#8a8a8a;margin-top:4px;}
+
+  .tag{text-align:center;font-size:13px;color:var(--musgo);letter-spacing:1px;margin-bottom:26px;font-weight:300;}
+
+  /* CONTROL CARD */
+  .card{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(200,151,58,0.25);
+    border-radius:20px;padding:22px 20px;margin-bottom:18px;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  }
+  .label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .label .t{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--musgo);font-weight:500;}
+  .label .v{font-family:'Fraunces';font-weight:600;font-size:26px;color:var(--dorado-l);}
+  .label .v small{font-size:13px;color:var(--musgo);font-weight:400;font-family:'Outfit';}
+
+  /* SLIDER */
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:6px;border-radius:6px;
+    background:linear-gradient(90deg,var(--dorado) var(--pct,30%),rgba(255,255,255,0.12) var(--pct,30%));
+    outline:none;margin:6px 0 2px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:30px;height:30px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff4dd, var(--dorado));
+    border:3px solid var(--crema);box-shadow:0 4px 12px rgba(0,0,0,0.4);cursor:pointer;
+  }
+  .scale{display:flex;justify-content:space-between;font-size:10px;color:#6a8a6a;margin-top:2px;}
+
+  /* PRESET CHIPS */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+  .chip{
+    flex:1;min-width:60px;padding:11px 4px;border-radius:12px;text-align:center;
+    background:rgba(255,255,255,0.05);border:1.5px solid transparent;
+    font-size:14px;font-weight:600;color:var(--crema);transition:all .15s;cursor:pointer;
+  }
+  .chip.on{background:var(--dorado);color:var(--verde-d);border-color:var(--dorado-l);}
+  .chip small{display:block;font-size:9px;font-weight:400;opacity:.7;margin-top:1px;}
+
+  /* RESULT */
+  .result{
+    background:linear-gradient(160deg,var(--verde) 0%,var(--verde-d) 100%);
+    border:1px solid rgba(200,151,58,0.4);border-radius:22px;
+    padding:6px 0 4px;margin-top:22px;overflow:hidden;
+    box-shadow:0 16px 40px rgba(0,0,0,0.45);
+  }
+  .rtop{text-align:center;padding:20px 20px 14px;border-bottom:1px solid rgba(200,151,58,0.2);}
+  .rtop .cap{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dorado-l);}
+  .rtop .price{font-family:'Fraunces';font-weight:900;font-size:46px;color:#fff;line-height:1.05;margin-top:4px;}
+  .rtop .pm2{font-size:12px;color:var(--musgo);margin-top:2px;}
+
+  .rgrid{display:grid;grid-template-columns:1fr 1fr;}
+  .ri{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,0.07);}
+  .ri:nth-child(odd){border-right:1px solid rgba(255,255,255,0.07);}
+  .ri .k{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--musgo);}
+  .ri .val{font-family:'Fraunces';font-weight:600;font-size:23px;color:var(--dorado-l);margin-top:3px;}
+  .ri .val small{font-size:11px;color:var(--musgo);font-family:'Outfit';}
+  .ri.hl .val{color:#fff;font-size:26px;}
+
+  .mens-banner{
+    text-align:center;padding:18px;background:rgba(200,151,58,0.12);
+  }
+  .mens-banner .k{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--dorado-l);}
+  .mens-banner .big{font-family:'Fraunces';font-weight:900;font-size:40px;color:#fff;line-height:1;margin-top:3px;}
+  .mens-banner .k2{font-size:12px;color:var(--musgo);margin-top:4px;}
+
+  .note{font-size:11px;color:#6a8a6a;text-align:center;margin-top:18px;line-height:1.5;padding:0 10px;}
+
+  .toggle{display:flex;gap:8px;margin-bottom:18px;}
+  .toggle div{
+    flex:1;padding:12px;text-align:center;border-radius:13px;font-size:13px;font-weight:600;
+    background:rgba(255,255,255,0.05);border:1.5px solid transparent;cursor:pointer;transition:.15s;
+  }
+  .toggle div.on{background:var(--verde-l);border-color:var(--dorado);color:#fff;}
+
+  .foot{text-align:center;margin-top:28px;font-size:10px;color:#557055;letter-spacing:.5px;}
+
+  /* TABS */
+  .tabs{display:flex;gap:8px;margin-bottom:20px;}
+  .tabs button{
+    flex:1;padding:13px;border:none;border-radius:14px;font-family:'Outfit';
+    font-size:13px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:.15s;
+    background:rgba(255,255,255,0.05);color:var(--musgo);
+  }
+  .tabs button.on{background:var(--dorado);color:var(--verde-d);box-shadow:0 6px 18px rgba(200,151,58,0.3);}
+  .view{display:none;}
+  .view.on{display:block;}
+
+  /* SCHEDULE TABLE */
+  .sched-actions{display:flex;gap:8px;margin-bottom:16px;}
+  .sched-actions button{
+    flex:1;padding:13px;border-radius:13px;border:1.5px solid var(--dorado);
+    background:var(--dorado);color:var(--verde-d);font-family:'Outfit';
+    font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;
+    justify-content:center;gap:6px;
+  }
+  .sched-actions button.ghost{background:transparent;color:var(--dorado-l);}
+  .sched-summary{
+    background:rgba(255,255,255,0.04);border:1px solid rgba(200,151,58,0.25);
+    border-radius:16px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--musgo);
+    line-height:1.7;
+  }
+  .sched-summary b{color:var(--crema);font-weight:600;}
+  table.sched{width:100%;border-collapse:collapse;font-size:13px;}
+  table.sched th{
+    background:var(--verde);color:var(--crema);padding:10px 8px;text-align:left;
+    font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+    position:sticky;top:0;
+  }
+  table.sched td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,0.07);color:var(--crema);}
+  table.sched tr.dic td{background:rgba(200,151,58,0.13);}
+  table.sched tr.dic td:first-child{color:var(--dorado-l);font-weight:600;}
+  table.sched tr.final td{background:rgba(27,108,168,0.18);font-weight:600;}
+  table.sched td.amt{text-align:right;font-variant-numeric:tabular-nums;}
+  table.sched td.sal{text-align:right;color:var(--musgo);font-variant-numeric:tabular-nums;}
+  .badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:6px;background:var(--dorado);color:var(--verde-d);font-weight:700;margin-left:6px;}
+
+  /* PRINT */
+  @media print{
+    body{background:#fff !important;color:#111 !important;padding:0;}
+    .wrap{max-width:100%;padding:0;}
+    .tabs,.sched-actions,.tag,.foot,#view-cot{display:none !important;}
+    .view.on{display:block !important;}
+    .logo{box-shadow:none;margin:0 auto 14px;}
+    .print-head{display:block !important;text-align:center;margin-bottom:14px;}
+    .sched-summary{background:#f4f0e8 !important;border:1px solid #C8973A;color:#333 !important;}
+    .sched-summary b{color:#1A3D1B !important;}
+    table.sched th{background:#1A3D1B !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    table.sched td{color:#222 !important;border-bottom:1px solid #ccc !important;}
+    table.sched tr.dic td{background:#f6e9c8 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    table.sched tr.dic td:first-child{color:#9a6f22 !important;}
+    table.sched tr.final td{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .badge{background:#C8973A !important;color:#1A3D1B !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+  .print-head{display:none;}
+  .print-head .pt{font-family:'Fraunces';font-size:18px;font-weight:900;color:#1A3D1B;}
+  .print-head .ps{font-size:12px;color:#555;margin-top:2px;}
+
+  /* EDITABLE NUMBER INPUT */
+  .numbox{
+    background:rgba(0,0,0,0.25);border:1.5px solid var(--dorado);border-radius:12px;
+    display:inline-flex;align-items:center;gap:4px;padding:4px 12px;
+  }
+  .numbox input{
+    background:transparent;border:none;outline:none;color:var(--dorado-l);
+    font-family:'Fraunces';font-weight:600;font-size:26px;width:84px;text-align:right;
+    -moz-appearance:textfield;
+  }
+  .numbox input::-webkit-outer-spin-button,.numbox input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .numbox .u{font-size:14px;color:var(--musgo);font-family:'Outfit';}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo">
+    <div class="r">RESERVA</div>
+    <div class="bar"></div>
+    <div class="ec">EL CIELO</div>
+    <div class="sub">FRACCIONAMIENTO CAMPESTRE</div>
+  </div>
+  <div class="tag">Cotizador de lotes · Autopista 95D</div>
+
+  <div class="tabs">
+    <button id="tab-cot" class="on" onclick="setView('cot')">Cotizador</button>
+    <button id="tab-sched" onclick="setView('sched')">Tabla de pagos</button>
+  </div>
+
+  <!-- ============ VISTA COTIZADOR ============ -->
+  <div id="view-cot" class="view on">
+
+  <!-- PLAN TOGGLE -->
+  <div class="toggle">
+    <div id="plan-normal" class="on" onclick="setPlan('normal')">Plan 8 años<br><small style="font-weight:400;opacity:.7">sin interés</small></div>
+    <div id="plan-ext" onclick="setPlan('ext')">Plan 10 años<br><small style="font-weight:400;opacity:.7">con interés</small></div>
+  </div>
+
+  <!-- SIZE -->
+  <div class="card">
+    <div class="label">
+      <span class="t">Tamaño exacto del lote</span>
+      <span class="numbox"><input type="number" id="szInput" min="60" max="2000" value="120" inputmode="numeric" oninput="szFromInput()"><span class="u">m²</span></span>
+    </div>
+    <input type="range" id="sz" min="60" max="600" step="1" value="120" oninput="calc()">
+    <div class="scale"><span>60 m²</span><span>600 m²</span></div>
+    <div class="chips" id="szChips"></div>
+    <div style="font-size:11px;color:var(--musgo);margin-top:10px;text-align:center;line-height:1.4">
+      Escribe la medida exacta (ej. <b style="color:var(--dorado-l)">122</b> o <b style="color:var(--dorado-l)">236</b>) o usa el deslizador
+    </div>
+  </div>
+
+  <!-- PRICE PER M2 -->
+  <div class="card">
+    <div class="label"><span class="t">Precio por m²</span><span class="v" id="pm2Val">$2,333</span></div>
+    <input type="range" id="pm2" min="2333.33" max="3840" step="0.01" value="2333.33" oninput="calc()">
+    <div class="scale"><span>Etapa 1 · $2,333</span><span>Etapa 6 · $3,840</span></div>
+    <div class="chips" id="etChips"></div>
+  </div>
+
+  <!-- ENGANCHE -->
+  <div class="card">
+    <div class="label"><span class="t">Enganche</span><span class="v" id="engVal">$10,000</span></div>
+    <input type="range" id="eng" min="10000" max="140000" step="1000" value="10000" oninput="calc()">
+    <div class="scale"><span id="engMin">Mínimo $10,000</span><span id="engPct">4%</span></div>
+    <div class="chips" id="engChips"></div>
+  </div>
+
+  <!-- PAGO DE DICIEMBRE (palanca principal) -->
+  <div class="card">
+    <div class="label">
+      <span class="t">Pago de diciembre</span>
+      <span class="numbox"><span class="u">$</span><input type="number" id="dicInput" min="0" max="200000" step="1000" value="26000" inputmode="numeric" oninput="dicFromInput()"></span>
+    </div>
+    <input type="range" id="dic" min="0" max="120000" step="1000" value="26000" oninput="dicFromSlider()">
+    <div class="scale"><span>$0</span><span>$120,000</span></div>
+    <div class="chips" id="dicChips"></div>
+    <div style="font-size:11px;color:var(--musgo);margin-top:10px;text-align:center;line-height:1.4">
+      Plazo fijo de <b style="color:var(--dorado-l)">76 meses</b>. ↑ Diciembre más alto = <b style="color:var(--dorado-l)">mensualidad más baja</b> (y recuperas más con el aguinaldo)
+    </div>
+  </div>
+
+  <!-- mensualidad oculta (ahora es resultado calculado) -->
+  <input type="hidden" id="mens" value="1500">
+
+  <!-- RESULT -->
+  <div class="result">
+    <div class="rtop">
+      <div class="cap">Precio del lote</div>
+      <div class="price" id="rPrecio">$280,000</div>
+      <div class="pm2" id="rPm2">$2,333 / m² · 120 m²</div>
+    </div>
+    <div class="mens-banner">
+      <div class="k">Mensualidad</div>
+      <div class="big" id="rMens">$1,500</div>
+      <div class="k2" id="rPlazo">se liquida en 76 meses · 6.3 años</div>
+    </div>
+    <div class="rgrid">
+      <div class="ri"><div class="k">Enganche</div><div class="val" id="rEng">$10,000</div></div>
+      <div class="ri"><div class="k">Cada diciembre</div><div class="val" id="rDic">$21,000</div></div>
+      <div class="ri"><div class="k">Pago final</div><div class="val" id="rUlt">$31,500</div></div>
+      <div class="ri hl"><div class="k">Total a pagar</div><div class="val" id="rTotal">$280,000</div></div>
+    </div>
+    <div id="extRow" class="mens-banner" style="display:none;background:rgba(27,108,168,0.15);">
+      <div class="k" style="color:#7FB5DD">Interés total (años 6-10)</div>
+      <div class="big" id="rInteres" style="font-size:28px;">$23,652</div>
+    </div>
+  </div>
+
+  <div class="note" id="note">
+    Plan sin intereses. El pago de diciembre coincide con el aguinaldo. Enganche, mensualidad, diciembre y pago final escalan según el tamaño del lote.
+  </div>
+
+  </div><!-- /view-cot -->
+
+  <!-- ============ VISTA TABLA DE PAGOS ============ -->
+  <div id="view-sched" class="view">
+    <div class="print-head">
+      <div class="pt">RESERVA EL CIELO · Calendario de pagos</div>
+      <div class="ps" id="printSub">Lote 120 m² · $280,000 · Plan 8 años</div>
+    </div>
+
+    <div class="sched-actions">
+      <button onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    </div>
+
+    <div class="sched-summary" id="schedSummary"></div>
+
+    <table class="sched" id="schedTable">
+      <thead><tr><th>Mes</th><th style="text-align:right">Pago</th><th style="text-align:right">Saldo</th></tr></thead>
+      <tbody id="schedBody"></tbody>
+    </table>
+  </div>
+  <div class="foot">RESERVA EL CIELO · Chilpancingo, Guerrero</div>
+</div>
+
+<script>
+  const SALDO120 = 270000; // 280000 - 10000 ref
+  let plan = 'normal';
+
+  // Size preset chips (medidas reales de ejemplo)
+  const sizes=[122,150,236,300,450];
+  const szChips=document.getElementById('szChips');
+  sizes.forEach(s=>{
+    const d=document.createElement('div');d.className='chip';d.dataset.sz=s;
+    d.innerHTML=s+'<small>m²</small>';
+    d.onclick=()=>{setSize(s);};
+    szChips.appendChild(d);
+  });
+  // Stage chips
+  const stages=[['E1',2333],['E2',2566],['E3',2900],['E4',3360],['E5',3840]];
+  const etChips=document.getElementById('etChips');
+  stages.forEach(([n,p])=>{
+    const d=document.createElement('div');d.className='chip';d.dataset.pm2=p;
+    d.innerHTML=n+'<small>$'+p.toLocaleString()+'</small>';
+    d.onclick=()=>{document.getElementById('pm2').value=p;calc();};
+    etChips.appendChild(d);
+  });
+  // Enganche chips (relative to minimum)
+  const engChips=document.getElementById('engChips');
+  [['Mín','min'],['+20mil',30000],['+50mil',60000],['+100mil',110000]].forEach(([lbl,v])=>{
+    const d=document.createElement('div');d.className='chip';d.dataset.eng=v;
+    d.innerHTML=lbl;
+    d.onclick=()=>{
+      const min=engMinFor();
+      document.getElementById('eng').value = v==='min'?min:Math.max(min,v);
+      calc();
+    };
+    engChips.appendChild(d);
+  });
+  // Diciembre chips
+  const dicChips=document.getElementById('dicChips');
+  [['Auto','auto'],['$26mil',26000],['$40mil',40000],['$60mil',60000]].forEach(([lbl,v])=>{
+    const d=document.createElement('div');d.className='chip';d.dataset.dic=v;
+    d.innerHTML=lbl;
+    d.onclick=()=>{
+      if(v==='auto'){ dicManual=false; }
+      else { dicManual=true; document.getElementById('dic').value=v; document.getElementById('dicInput').value=v; }
+      calc();
+    };
+    dicChips.appendChild(d);
+  });
+
+  let dicManual=false; // si el usuario fijó un diciembre manual
+  function dicFromSlider(){
+    dicManual=true;
+    document.getElementById('dicInput').value=document.getElementById('dic').value;
+    calc();
+  }
+  function dicFromInput(){
+    dicManual=true;
+    let v=parseInt(document.getElementById('dicInput').value)||0;
+    document.getElementById('dic').value=Math.min(Math.max(v,0),120000);
+    calc();
+  }
+
+  function engMinFor(){
+    const sz=+document.getElementById('sz').value;
+    const pm2=+document.getElementById('pm2').value;
+    return engEscalon(sz*pm2);
+  }
+
+  // Sincroniza el número escrito con el deslizador
+  function setSize(v){
+    v=Math.round(v);
+    document.getElementById('sz').value=Math.min(Math.max(v,60),600);
+    document.getElementById('szInput').value=v;
+    calc();
+  }
+  function szFromInput(){
+    let v=parseInt(document.getElementById('szInput').value)||0;
+    // el slider llega a 600 pero el cliente puede escribir más
+    document.getElementById('sz').value=Math.min(Math.max(v,60),600);
+    calc();
+  }
+
+  function setPlan(p){
+    plan=p;
+    document.getElementById('plan-normal').classList.toggle('on',p==='normal');
+    document.getElementById('plan-ext').classList.toggle('on',p==='ext');
+    document.getElementById('extRow').style.display = p==='ext'?'block':'none';
+    document.getElementById('note').textContent = p==='ext'
+      ? 'Plan extendido a 10 años. Sin interés los primeros 5 años; 12% anual sobre saldo desde el año 6. Diciembres solo en los primeros 5 años.'
+      : 'Plan sin intereses. El pago de diciembre coincide con el aguinaldo. Enganche, mensualidad, diciembre y pago final escalan según el tamaño del lote.';
+    calc();
+  }
+
+  const f = n => '$'+Math.round(n).toLocaleString('es-MX');
+
+  function engEscalon(precio){
+    if(precio<=350000) return 10000;
+    if(precio<=500000) return precio*0.05;
+    if(precio<=800000) return precio*0.07;
+    return precio*0.10;
+  }
+
+  function calc(){
+    // tamaño: el input escrito manda; si movieron el slider, sincroniza el input
+    const slider=+document.getElementById('sz').value;
+    const typed=parseInt(document.getElementById('szInput').value)||0;
+    // si el slider difiere del input, significa que movieron el slider -> actualiza input
+    let sz;
+    if(document.activeElement && document.activeElement.id==='szInput'){
+      sz = typed>0?typed:slider;
+    } else {
+      sz = slider;
+      document.getElementById('szInput').value = slider;
+    }
+    if(sz<1) sz=1;
+    const pm2=+document.getElementById('pm2').value;
+    const precio=sz*pm2;
+    const engMin=engEscalon(precio);
+
+    // enganche slider: ensure not below minimum for this lot
+    const engInput=document.getElementById('eng');
+    engInput.min=engMin;
+    if(+engInput.value<engMin) engInput.value=engMin;
+    const eng=+engInput.value;
+    const saldo=precio-eng;
+    const factor=saldo/SALDO120;
+    // Diciembre "auto": el que hace que la mensualidad sea ~$1,500 escalada al tamaño,
+    // con plazo fijo de 76 meses y 6 diciembres. dic = (saldo - 76*mensObjetivo)/6
+    const mensObjetivo=1500*factor; // $1,500 para 120m², escala con el lote
+    const dicAuto=Math.max(Math.round((saldo-76*mensObjetivo)/6/500)*500,0);
+    let dic;
+    if(dicManual){
+      dic=+document.getElementById('dic').value;
+    } else {
+      dic=dicAuto;
+      document.getElementById('dic').value=Math.min(dicAuto,120000);
+      document.getElementById('dicInput').value=dicAuto;
+    }
+
+    // slider fills
+    document.getElementById('sz').style.setProperty('--pct',((Math.min(sz,600)-60)/(600-60)*100)+'%');
+    document.getElementById('pm2').style.setProperty('--pct',((pm2-2333)/(3840-2333)*100)+'%');
+    engInput.style.setProperty('--pct',((eng-engMin)/(140000-engMin)*100)+'%');
+    document.getElementById('dic').style.setProperty('--pct',(Math.min(dic,120000)/120000*100)+'%');
+    document.getElementById("pm2Val").textContent=f(pm2);
+    document.getElementById('engVal').textContent=f(eng);
+    document.getElementById('engMin').textContent='Mínimo '+f(engMin);
+    document.getElementById('engPct').textContent=(eng/precio*100).toFixed(1)+'%';
+    // marca chip diciembre activo
+    document.querySelectorAll('#dicChips .chip').forEach(c=>{
+      if(c.dataset.dic==='auto') c.classList.toggle('on',!dicManual);
+      else c.classList.toggle('on',dicManual && +c.dataset.dic===dic);
+    });
+
+    // active chips
+    document.querySelectorAll('#szChips .chip').forEach(c=>c.classList.toggle('on',+c.dataset.sz===sz));
+    document.querySelectorAll('#etChips .chip').forEach(c=>c.classList.toggle('on',+c.dataset.pm2===pm2));
+
+    document.getElementById('rPrecio').textContent=f(precio);
+    document.getElementById('rPm2').textContent=f(pm2)+' / m² · '+sz+' m²';
+    document.getElementById('rEng').textContent=f(eng);
+    document.getElementById('rDic').textContent=f(dic);
+
+    if(plan==='normal'){
+      // PLAZO FIJO 76 meses. 6 diciembres dentro del plazo. Último pago = mensualidad.
+      // mensualidad se recalcula: (saldo - 6*dic) repartido en 76 pagos
+      const NDIC=6, NMENS=76;
+      // tope de diciembre: que la mensualidad no baje de $500
+      const dicMax=Math.floor((saldo-NMENS*500)/NDIC/500)*500;
+      if(dic>dicMax){ dic=dicMax; if(dicManual){document.getElementById('dic').value=Math.min(dic,120000);document.getElementById('dicInput').value=dic;} }
+      const mensCalc=(saldo - NDIC*dic)/NMENS;
+      document.getElementById('rMens').textContent=f(mensCalc);
+      document.getElementById('rPlazo').textContent=`plazo fijo · 76 meses · 6.3 años`;
+      document.getElementById('rUlt').textContent=f(mensCalc);
+      document.getElementById('rTotal').textContent=f(eng+mensCalc*NMENS+dic*NDIC);
+    } else {
+      // Plan extendido 120 meses (interés desde año 6). 5 diciembres. mensualidad recalcula.
+      const tasa=0.12/12, NDIC=5, NMENS=120;
+      // bisección de mensualidad para liquidar en 120 meses con 'dic' fijo
+      const sim=m=>{let s=saldo;for(let mes=1;mes<=NMENS;mes++){if(mes>=61)s+=s*tasa;s-=m;if(mes%12===0&&mes<=60)s-=dic;}return s;};
+      let lo=0,hi=30000;for(let i=0;i<70;i++){const mid=(lo+hi)/2;if(sim(mid)>0)lo=mid;else hi=mid;}
+      const mensCalc=(lo+hi)/2;
+      let s=saldo,ti=0;for(let mes=1;mes<=NMENS;mes++){if(mes>=61){const it=s*tasa;s+=it;ti+=it;}s-=mensCalc;if(mes%12===0&&mes<=60)s-=dic;}
+      document.getElementById('rMens').textContent=f(mensCalc);
+      document.getElementById('rPlazo').textContent=`plazo fijo · 120 meses · 10 años`;
+      document.getElementById('rUlt').textContent='—';
+      document.getElementById('rInteres').textContent=f(ti);
+      document.getElementById('rTotal').textContent=f(eng+mensCalc*NMENS+dic*NDIC);
+    }
+  }
+
+  // Simulador plan normal (sin interés). Diciembre cae cada 12 meses (calendario sep start).
+  function simularNormal(saldo,mens,dic){
+    let s=saldo,mes=0,totalPagado=0,ultimo=0,dicCount=0;
+    const startM=9; // septiembre
+    const MAX=600;
+    while(s>0 && mes<MAX){
+      mes++;
+      // ¿es diciembre? mes calendario
+      const mIdx=(startM-1+mes)%12; // 0=ene
+      if(s<=mens){ ultimo=s; totalPagado+=s; s=0; break; }
+      s-=mens; totalPagado+=mens;
+      if(mIdx===11 && s>0){ // diciembre
+        const d=Math.min(dic,s); s-=d; totalPagado+=d; dicCount++;
+        if(s<=0){ break; }
+      }
+    }
+    if(ultimo===0) ultimo=mens; // si terminó justo en mensualidad
+    return {meses:mes,totalPagado,ultimo,dicCount};
+  }
+
+  // Simulador plan extendido (interés desde mes 61, tope 120 meses; diciembres años 1-5)
+  function simularExt(saldo,mens,dic,tasa){
+    let s=saldo,mes=0,totalPagado=0,interes=0,ultimo=0,dicCount=0;
+    const startM=9, MAX=120;
+    while(s>0 && mes<MAX){
+      mes++;
+      if(mes>=61){ const it=s*tasa; s+=it; interes+=it; }
+      const mIdx=(startM-1+mes)%12;
+      if(s<=mens){ ultimo=s; totalPagado+=s; s=0; break; }
+      s-=mens; totalPagado+=mens;
+      if(mIdx===11 && mes<=60 && s>0){ const d=Math.min(dic,s); s-=d; totalPagado+=d; dicCount++; }
+    }
+    return {meses:mes,totalPagado,interes,ultimo,dicCount};
+  }
+  function setView(v){
+    document.getElementById('tab-cot').classList.toggle('on',v==='cot');
+    document.getElementById('tab-sched').classList.toggle('on',v==='sched');
+    document.getElementById('view-cot').classList.toggle('on',v==='cot');
+    document.getElementById('view-sched').classList.toggle('on',v==='sched');
+    if(v==='sched') buildSchedule();
+  }
+
+  const MES_NOM=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  function buildSchedule(){
+    const sz=parseInt(document.getElementById('szInput').value)||+document.getElementById('sz').value;
+    const pm2=+document.getElementById('pm2').value;
+    const precio=sz*pm2;
+    const eng=+document.getElementById('eng').value;
+    const saldo=precio-eng;
+    const dic=+document.getElementById('dic').value;
+    const body=document.getElementById('schedBody');
+    let rows='';
+    let startY=2026, startM=9; // sep 2026
+    rows+=`<tr><td>Hoy · Enganche</td><td class="amt">${f(eng)}</td><td class="sal">${f(saldo)}</td></tr>`;
+
+    if(plan==='normal'){
+      // PLAZO FIJO 76 meses · 6 diciembres · mensualidad recalculada
+      const NDIC=6, NMENS=76;
+      const mens=(saldo - NDIC*dic)/NMENS;
+      let s=saldo, dicCount=0;
+      for(let k=1;k<=NMENS;k++){
+        const mIdx=(startM-1+k)%12, yr=startY+Math.floor((startM-1+k)/12);
+        const etiqueta=`${MES_NOM[mIdx]} ${String(yr).slice(2)}`;
+        if(k===NMENS){
+          rows+=`<tr class="final"><td>${k}. ${etiqueta} · Pago final</td><td class="amt">${f(Math.max(s,0))}</td><td class="sal">$0</td></tr>`;
+          s=0; break;
+        }
+        s-=mens;
+        rows+=`<tr><td>${k}. ${etiqueta}</td><td class="amt">${f(mens)}</td><td class="sal">${f(Math.max(s,0))}</td></tr>`;
+        if(mIdx===11 && dicCount<NDIC && s>0){
+          s-=dic; dicCount++;
+          rows+=`<tr class="dic"><td>★ Diciembre ${yr} <span class="badge">Aguinaldo</span></td><td class="amt">${f(dic)}</td><td class="sal">${f(Math.max(s,0))}</td></tr>`;
+        }
+      }
+      document.getElementById('schedSummary').innerHTML=
+        `Lote <b>${sz} m²</b> · Precio <b>${f(precio)}</b> · Plazo fijo 76 meses (sin interés)<br>`+
+        `Enganche <b>${f(eng)}</b> · Mensualidad <b>${f(mens)}</b> · ${NDIC} diciembres de <b>${f(dic)}</b>`;
+      document.getElementById('printSub').textContent=`Lote ${sz} m² · ${f(precio)} · Enganche ${f(eng)} · Mensualidad ${f(mens)} · diciembre ${f(dic)} · 76 meses`;
+    } else {
+      const tasa=0.12/12, NDIC=5, NMENS=120;
+      const sim=m=>{let s=saldo;for(let mes=1;mes<=NMENS;mes++){if(mes>=61)s+=s*tasa;s-=m;if(mes%12===0&&mes<=60)s-=dic;}return s;};
+      let lo=0,hi=30000;for(let i=0;i<70;i++){const mid=(lo+hi)/2;if(sim(mid)>0)lo=mid;else hi=mid;}
+      const mens=(lo+hi)/2;
+      let s=saldo, dicCount=0, tiTot=0;
+      for(let k=1;k<=NMENS;k++){
+        if(k>=61){const it=s*tasa;s+=it;tiTot+=it;}
+        const mIdx=(startM-1+k)%12, yr=startY+Math.floor((startM-1+k)/12);
+        const etiqueta=`${MES_NOM[mIdx]} ${String(yr).slice(2)}`;
+        let intMark = k>=61?' <span class="badge" style="background:#1B6CA8;color:#fff">+int</span>':'';
+        if(k===NMENS){
+          rows+=`<tr class="final"><td>${k}. ${etiqueta} · Pago final${intMark}</td><td class="amt">${f(Math.max(s,0))}</td><td class="sal">$0</td></tr>`;
+          s=0; break;
+        }
+        s-=mens;
+        rows+=`<tr><td>${k}. ${etiqueta}${intMark}</td><td class="amt">${f(mens)}</td><td class="sal">${f(Math.max(s,0))}</td></tr>`;
+        if(mIdx===11 && k<=60 && dicCount<NDIC && s>0){
+          s-=dic; dicCount++;
+          rows+=`<tr class="dic"><td>★ Diciembre ${yr} <span class="badge">Aguinaldo</span></td><td class="amt">${f(dic)}</td><td class="sal">${f(Math.max(s,0))}</td></tr>`;
+        }
+      }
+      document.getElementById('schedSummary').innerHTML=
+        `Lote <b>${sz} m²</b> · Precio <b>${f(precio)}</b> · Plazo fijo 120 meses (interés 12% desde año 6)<br>`+
+        `Enganche <b>${f(eng)}</b> · Mensualidad <b>${f(mens)}</b> · ${NDIC} diciembres de <b>${f(dic)}</b> · Interés total <b>${f(tiTot)}</b>`;
+      document.getElementById('printSub').textContent=`Lote ${sz} m² · ${f(precio)} · Mensualidad ${f(mens)} · diciembre ${f(dic)} · 120 meses`;
+    }
+    body.innerHTML=rows;
+  }
+
+  calc();
+</script>
+</body>
+</html>
